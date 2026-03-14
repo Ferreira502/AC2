@@ -1,0 +1,57 @@
+Relatorio Exercicio Pratico 04 ULA 4 bits + Arduino
+
+1. Objetivo
+
+Desenvolver um programa que leia instruções de um arquivo ( `teste.ula` ), 
+processe os valores de entrada e gere um arquivo de saída ( `testeula.hex` ) compatível com o hardware Arduino.
+
+-----------------------------
+
+2. Lógica de Funcionamento
+
+Para processar os dados, utilizamos duas pilhas:
+
+1) Leitura ( Pilha 1 ): O arquivo é lido linha por linha. Cada instrução é empilhada na Pilha 1.
+
+2) Ordenação ( Pilha 2 ): Como a última linha lida fica no topo, passamos tudo da Pilha 1 para a Pilha 2. 
+Isso inverte a ordem, deixando a primeira instrução do arquivo pronta para ser a primeira a sair.
+
+3) Execução: O programa retira as instruções da Pilha 2 uma a uma para processar.
+
+
+Exemplo:
+
+    Pilha 1            Pilha 2
+
+|            |     |            |              
+|    fim.    |     |    inicio: |                   Se: w=AB
+|    W=Bn    |     |    X=C     |                         W -> Hexa = B 
+|    X=D     |     |    Y=6     |                         X - > C
+|    W=nAeB  |     |    W=AB    |                         Y - > 6 
+|    W=AoB   |     |    X=A     |                   Se: w=' '
+|    Y=3     |     |    Y=3     |                         Erro na linha   
+|    X=A     |     |    W=AoB   |
+|    W=AB    |     |    W=nAeB  |
+|    Y=6     |     |    X=D     |           
+|    X=C     |     |    w=Bn    |
+|   inicio:  |     |    fim.    |
+|____________|     |____________|
+
+-----------------------------
+
+3. Processamento de Dados
+
+O compilador realiza as seguintes tarefas em cada linha:
+
+- Identificação: Reconhece o que é valor de entrada ( X e Y ) e o que é operação de saída ( W ).
+- Cálculo: Realiza a operação lógica solicitada ( ex: CopiaA, AeBn , AeB ).
+- Conversão: Transforma o resultado e os comandos em formato Hexadecimal.
+
+-----------------------------
+
+4. Resultado Final
+
+O arquivo `testeula.hex` gerado contém a sequência de códigos que o Arduino deve seguir para acionar os LEDs ou circuitos da ULA de 4 bits, 
+garantindo que o comportamento digital coincida com o que foi escrito no arquivo de teste.
+
+-----------------------------
