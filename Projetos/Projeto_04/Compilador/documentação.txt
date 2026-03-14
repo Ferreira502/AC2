@@ -11,7 +11,7 @@ processe os valores de entrada e gere um arquivo de saída ( `testeula.hex` ) co
 
 Para processar os dados, utilizamos duas pilhas:
 
-1) Leitura ( Pilha 1 ): O arquivo é lido linha por linha. Cada instrução é empilhada na Pilha 1.
+1) Leitura ( Pilha 1 ): O arquivo é lido linha por linha, cada instrução é empilhada na Pilha 1.
 
 2) Ordenação ( Pilha 2 ): Como a última linha lida fica no topo, passamos tudo da Pilha 1 para a Pilha 2. 
 Isso inverte a ordem, deixando a primeira instrução do arquivo pronta para ser a primeira a sair.
