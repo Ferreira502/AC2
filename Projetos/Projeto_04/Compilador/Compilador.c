@@ -5,18 +5,18 @@
 #include "MyIO.h"
 
 #define ARQUIVO_NOME "test.ula"
-#define ARQUIVO_HEX "test.hex"
+#define ARQUIVO_HEX  "test.hex"
 
 /**
  * @author Gabriel Nogueira
- * 
+ *
  * @param arquivo_fp
- * 
+ *
  * @reason  Funcao cria duas pilhas:
  *          Pilha A para ler os dados e armazená-los da maneira invertida ao processamento
  *          Pilha B para receber os dados da pilha A e armazená-los na ordem correta
- * 
- * @return pilhaB
+ *
+ * @return pilhaB (ordem correta, inicio->fim)
  */
 Pilha* lerLinhas(FILE* arquivo_fp)
 {
@@ -25,25 +25,36 @@ Pilha* lerLinhas(FILE* arquivo_fp)
     int indiceLinha = 1;
     bool continuar = true;
     char linha[MAX_STRING_SIZE];
-
+ 
     // Remove a linha "inicio"
     fgets(linha, sizeof(linha), arquivo_fp);
-
+ 
     while (fgets(linha, sizeof(linha), arquivo_fp) != NULL && continuar)
     {
         indiceLinha++;
-
-        if (linhaValida(linha))
+        linha[strcspn(linha, "\n")] = '\0';
+ 
+        // Para ao encontrar "fim."
+        if (strcmp(linha, "fim.") == 0)
         {
-            push(pilhaA, linha);
-        }
-        else
-        {
-            printErroLinha(linha, indiceLinha);
             continuar = false;
         }
-    }
+ 
+        else
+        {
+            if (linhaValida(linha))
+            {
+                push(pilhaA, linha);
+            }
 
+            else
+            {
+                printErroLinha(linha, indiceLinha);
+                continuar = false;
+            }
+        }   
+    }
+ 
     // Transfere as linhas da pilha A para pilha B, armazenando na ordem correta
     while (!pilhaVazia(pilhaA))
     {
@@ -51,57 +62,68 @@ Pilha* lerLinhas(FILE* arquivo_fp)
         push(pilhaB, elemento);
         free(elemento);
     }
-
     free(pilhaA);
+ 
     return pilhaB;
 }
-
+ 
 /**
  * @author Gabriel Ferreira
- * 
- * @param pilhaResultado, ARQUIVO_HEX
- * 
- * @reason  Funcao que vai pegar a PilhaB trocar para os seus valores correspondende
- * e vai gerar um arquivo test.hex
- * 
- * @return pilhaB
+ *
+ * @param pilhaResultado  pilhaB vinda do lerLinhas
+ * @param arquivoHex      arquivo de saida
+ *
+ * @reason  Processa pilhaB diretamente
+ *          Rastreia X e Y. Sempre que encontrar W, escreve XYW no hex.
  */
-
-void gerarArquivoHex(Pilha* pilhaResultado)
+void gerarArquivoHex( Pilha* pilhaResultado, FILE* arquivoHex )
 {
-    FILE* arquivoHex = fopen(ARQUIVO_HEX, "w");
-
-    if (arquivoHex == NULL)
+    // Registradores X e Y
+    char X = ' ';
+    char Y = ' ';
+ 
+    // pilhaB.topo
+    while ( !pilhaVazia(pilhaResultado) )
     {
-        printf("Erro ao criar o arquivo %s\n", ARQUIVO_HEX);
-    }
-    
-    else
-    {
-        while (!pilhaVazia(pilhaResultado))
+        char* elemento = pop(pilhaResultado);
+ 
+        switch (elemento[0])
         {
-            char* linha = pop(pilhaResultado);
-            char resultado = trocarMne(linha);
-            fprintf(arquivoHex, "%c\n", resultado);
-            free(linha);
+            case 'X':
+                X = trocarMne(elemento);
+                break;
+            case 'Y':
+                Y = trocarMne(elemento);
+                break;
+            case 'W':
+                // Converte W e escreve XYW no arquivo hex
+                fprintf( arquivoHex, "%c%c%c\n", X, Y, trocarMne(elemento) );
+                break;
         }
+ 
+        free(elemento);
     }
-
-    fclose(arquivoHex);
 }
 
 int main(void)
 {
     FILE* arquivo_fp = fopen(ARQUIVO_NOME, "r");
-
     if (arquivo_fp != NULL)
     {
+        FILE* arquivoHex = fopen(ARQUIVO_HEX, "w");
+        if (arquivoHex == NULL)
+        {
+            printf("Erro ao criar o arquivo %s\n", ARQUIVO_HEX);
+            fclose(arquivo_fp);
+            return 1;
+        }
+ 
         Pilha* pilhaResultado = lerLinhas(arquivo_fp);
         fclose(arquivo_fp);
-
-        //imprimirPilha(pilhaResultado);
-
-        gerarArquivoHex(pilhaResultado);
+ 
+        gerarArquivoHex(pilhaResultado, arquivoHex);
+ 
+        fclose(arquivoHex);
         free(pilhaResultado);
     }
     else
@@ -109,7 +131,5 @@ int main(void)
         printf("Erro ao abrir o arquivo %s\n", ARQUIVO_NOME);
         return 1;
     }
-
     return 0;
 }
-

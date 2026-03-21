@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define MAX_STRING_SIZE 20
+#define MAX_STRING_SIZE 64
 
 typedef struct Pilha
 {
@@ -25,10 +25,10 @@ bool pilhaVazia(Pilha* pilha);
  * @param Pilha
  * @return void
  */
+
 void imprimirPilha(Pilha* pilha)
 {
     Celula* atual = pilha->topo;
-
     while (atual != NULL)
     {
         printf("%s", atual->string);
@@ -58,6 +58,7 @@ void println(const char* frase)
     printf("%s\n", frase);
 }
 
+
 /**
  * @author Gabriel Nogueira
  * @reason Mostra a frase com o erro de leitura
@@ -72,113 +73,93 @@ void printErroLinha(const char* frase, int indiceLinha)
 
 /**
  * @author Gabriel Ferreira
- * @reason Verifica qual caracter
+ * @reason Troca a palavra mnemonica pelo valor hexadecimal correspondente
  * @param palavra
+ * @ return caracter correspondente
  */
 char trocarMne ( char palavra[] )
 {
     char x = ' ';
-
+ 
     if ( palavra[1] == '=' )
     {
-        /* 1 */  
+        /* 1 */
         if ( palavra[2] == 'C' && palavra[7] == 'B' ) // CopiaB
-        {
             x = '0';
-        }
-
+ 
         /* 2 */
         if ( palavra[2] == 'C' && palavra[7] == 'A' ) // CopiaA
-        {
             x = '1';
-        }
-
+ 
         /* 4 */
         if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'x' && palavra[5] == 'n' && palavra[6] == 'B' ) // nAxnB
-        {
             x = '3';
-        }
-         
+ 
         /* 7 */
         if ( palavra[2] == 'n' && palavra[3] == 'a' && palavra[4] == 'o' && palavra[5] == 'n' && palavra[6] == 'B' ) // naonB
-        {
             x = '6';
-        }
-
+ 
         /* 11 */
-        if ( palavra[2] == 'Z' && palavra[3] == 'e' && palavra[4] == 'r' && palavra[5] == 'o' && palavra[6] == 'L'  ) // ZeroL
-        {
+        if ( palavra[2] == 'Z' && palavra[3] == 'e' && palavra[4] == 'r' && palavra[5] == 'o' && palavra[6] == 'L' ) // ZeroL
             x = 'A';
-        }
-
+ 
         /* 16 */
-        if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'e' && palavra[5] == 'B' && palavra[6] == 'n'  ) // nAeBn
-        {
+        if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'e' && palavra[5] == 'n' && palavra[6] == 'B' ) // nAeBn
             x = 'F';
-        }
-
+ 
         /* 14 */
         if ( palavra[2] == 'A' && palavra[3] == 'e' && palavra[4] == 'n' && palavra[5] == 'B' ) // AenB
-        {
-            x = 'D' ;
-        }
-
+            x = 'D';
+ 
         /* 5 */
         if ( palavra[2] == 'A' && palavra[3] == 'e' && palavra[4] == 'B' && palavra[5] == 'n' ) // AeBn
-        {
             x = '4';
-        }
-
+ 
         /* 9 */
         if ( palavra[2] == 'A' && palavra[3] == 'o' && palavra[4] == 'n' && palavra[5] == 'B' ) // AonB
-        {
             x = '8';
-        }
-    
+ 
         /* 13 */
         if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'e' && palavra[5] == 'B' ) // nAeB
-        {
             x = 'C';
-        }
-        
+ 
         /* 3 */
         if ( palavra[2] == 'A' && palavra[3] == 'x' && palavra[4] == 'B' ) // AxB
-        {
             x = '2';
-        }    
-
+ 
         /* 6 */
         if ( palavra[2] == 'n' && palavra[3] == 'B' ) // nB
-        {
             x = '5';
-        }
-
+ 
         /* 8 */
-        if ( palavra[2] == 'n' && palavra[3] == 'A' ) // nA
-        {
+        if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] != 'e' && palavra[4] != 'x' && palavra[4] != 'B' ) // nA
             x = '7';
-        }
-
+ 
         /* 10 */
         if ( palavra[2] == 'U' && palavra[3] == 'm' && palavra[4] == 'L' ) // UmL
-        {
             x = '9';
-        }
-
+ 
         /* 12 */
-        if ( palavra[2] == 'A' && palavra[3] == 'e' && palavra[4] == 'B' ) // AeB
-        {
+        if ( palavra[2] == 'A' && palavra[3] == 'B' ) // AB
             x = 'B';
-        }
-        
+ 
+        /* 12 */
+        if ( palavra[2] == 'A' && palavra[3] == 'e' && palavra[4] == 'B' && palavra[5] != 'n' ) // AeB
+            x = 'B';
+ 
         /* 15 */
         if ( palavra[2] == 'A' && palavra[3] == 'o' && palavra[4] == 'B' ) // AoB
-        {
             x = 'E';
+ 
+        /* valor direto*/
+        if ( x == ' ' && (palavra[3] == ';' || palavra[3] == '\0') )
+        {
+            char y = palavra[2];
+            if ( (y >= '0' && y <= '9') || (y >= 'A' && y <= 'F') )
+                x = y;
         }
-
     }
-
+ 
     return x;
 }
 
@@ -193,20 +174,27 @@ bool linhaValida(const char* linha)
     int length = strlen(linha);
     bool valido = true;
 
-    if(linha!=NULL)
+    // Desconta \n do final para nao interferir na verificacao do ';'
+    while (length > 0 && (linha[length - 1] == '\n'))
     {
-        if(linha[length] != ';')
+        length--;
+    }
+
+    if(linha != NULL)
+    {
+        if(linha[length - 1] != ';')
         {
-            valido = 1;
+            valido = 0;
         }
     }
     else
     {
-        valido = 1;
+        valido = 0;
     }
 
     return valido;
 }
+
 
 /**
  * @author Gabriel Nogueira
@@ -253,7 +241,6 @@ char* pop(Pilha* pilha)
         char* str = temp->string;
         pilha->topo = temp->proximo;
         free(temp);
-        
         return str;
     }
 }
