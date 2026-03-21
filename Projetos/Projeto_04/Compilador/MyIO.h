@@ -1,0 +1,270 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MAX_STRING_SIZE 20
+
+typedef struct Pilha
+{
+    struct Celula* topo;
+} Pilha;
+
+typedef struct Celula
+{
+    char* string;
+    struct Celula* proximo;
+} Celula;
+
+bool pilhaVazia(Pilha* pilha);
+
+/**
+ * @author Gabriel Nogueira
+ * @reason Mostra os elementos da pilha
+ * @param Pilha
+ * @return void
+ */
+void imprimirPilha(Pilha* pilha)
+{
+    Celula* atual = pilha->topo;
+
+    while (atual != NULL)
+    {
+        printf("%s", atual->string);
+        atual = atual->proximo;
+    }
+}
+
+/**
+ * @author Gabriel Nogueira
+ * @param frase
+ * @reason Mostrar uma frase
+ * @return void
+ */
+void print(const char* frase)
+{
+    printf("%s", frase);
+}
+
+/**
+ * @author Gabriel Nogueira
+ * @param frase
+ * @reason Mostrar uma frase com quebra de linha no final
+ * @return void
+ */
+void println(const char* frase)
+{
+    printf("%s\n", frase);
+}
+
+/**
+ * @author Gabriel Nogueira
+ * @reason Mostra a frase com o erro de leitura
+ * @param frase
+ * @param indiceLinha
+ * @return void
+ */
+void printErroLinha(const char* frase, int indiceLinha)
+{
+    printf("Erro na leitura da linha %d\nEntrada: %s\n", indiceLinha, frase);
+}
+
+/**
+ * @author Gabriel Ferreira
+ * @reason Verifica qual caracter
+ * @param palavra
+ */
+char trocarMne ( char palavra[] )
+{
+    char x = ' ';
+
+    if ( palavra[1] == '=' )
+    {
+        /* 1 */  
+        if ( palavra[2] == 'C' && palavra[7] == 'B' ) // CopiaB
+        {
+            x = '0';
+        }
+
+        /* 2 */
+        if ( palavra[2] == 'C' && palavra[7] == 'A' ) // CopiaA
+        {
+            x = '1';
+        }
+
+        /* 4 */
+        if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'x' && palavra[5] == 'n' && palavra[6] == 'B' ) // nAxnB
+        {
+            x = '3';
+        }
+         
+        /* 7 */
+        if ( palavra[2] == 'n' && palavra[3] == 'a' && palavra[4] == 'o' && palavra[5] == 'n' && palavra[6] == 'B' ) // naonB
+        {
+            x = '6';
+        }
+
+        /* 11 */
+        if ( palavra[2] == 'Z' && palavra[3] == 'e' && palavra[4] == 'r' && palavra[5] == 'o' && palavra[6] == 'L'  ) // ZeroL
+        {
+            x = 'A';
+        }
+
+        /* 16 */
+        if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'e' && palavra[5] == 'B' && palavra[6] == 'n'  ) // nAeBn
+        {
+            x = 'F';
+        }
+
+        /* 14 */
+        if ( palavra[2] == 'A' && palavra[3] == 'e' && palavra[4] == 'n' && palavra[5] == 'B' ) // AenB
+        {
+            x = 'D' ;
+        }
+
+        /* 5 */
+        if ( palavra[2] == 'A' && palavra[3] == 'e' && palavra[4] == 'B' && palavra[5] == 'n' ) // AeBn
+        {
+            x = '4';
+        }
+
+        /* 9 */
+        if ( palavra[2] == 'A' && palavra[3] == 'o' && palavra[4] == 'n' && palavra[5] == 'B' ) // AonB
+        {
+            x = '8';
+        }
+    
+        /* 13 */
+        if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'e' && palavra[5] == 'B' ) // nAeB
+        {
+            x = 'C';
+        }
+        
+        /* 3 */
+        if ( palavra[2] == 'A' && palavra[3] == 'x' && palavra[4] == 'B' ) // AxB
+        {
+            x = '2';
+        }    
+
+        /* 6 */
+        if ( palavra[2] == 'n' && palavra[3] == 'B' ) // nB
+        {
+            x = '5';
+        }
+
+        /* 8 */
+        if ( palavra[2] == 'n' && palavra[3] == 'A' ) // nA
+        {
+            x = '7';
+        }
+
+        /* 10 */
+        if ( palavra[2] == 'U' && palavra[3] == 'm' && palavra[4] == 'L' ) // UmL
+        {
+            x = '9';
+        }
+
+        /* 12 */
+        if ( palavra[2] == 'A' && palavra[3] == 'e' && palavra[4] == 'B' ) // AeB
+        {
+            x = 'B';
+        }
+        
+        /* 15 */
+        if ( palavra[2] == 'A' && palavra[3] == 'o' && palavra[4] == 'B' ) // AoB
+        {
+            x = 'E';
+        }
+
+    }
+
+    return x;
+}
+
+/**
+ * @author Gabriel Nogueira
+ * @reason Verificar se a linha é vazia ou possui ';' no final
+ * @param linha string a verificar
+ * @return true se vazia ou termina com ';', false caso contrário
+*/
+bool linhaValida(const char* linha)
+{
+    int length = strlen(linha);
+    bool valido = true;
+
+    if(linha!=NULL)
+    {
+        if(linha[length] != ';')
+        {
+            valido = 1;
+        }
+    }
+    else
+    {
+        valido = 1;
+    }
+
+    return valido;
+}
+
+/**
+ * @author Gabriel Nogueira
+ * @reason Criar uma pilha vazia
+ * @return pilha criada
+*/
+Pilha* criarPilha(void)
+{
+    Pilha* pilha = (Pilha*)malloc(sizeof(Pilha));
+    pilha->topo = NULL;
+    return pilha;
+}
+
+/**
+ * @author Gabriel Nogueira
+ * @reason Fazer push de um elemento na pilha
+ * @param pilha pilha onde inserir
+ * @param str string a inserir
+ * @return void
+*/
+void push(Pilha* pilha, const char* str)
+{
+    Celula* nova = (Celula*)malloc(sizeof(Celula));
+    nova->string = strdup(str);
+    nova->proximo = pilha->topo;
+    pilha->topo = nova;
+}
+
+/**
+ * @author Gabriel Nogueira
+ * @reason Fazer pop de um elemento da pilha
+ * @param pilha pilha onde remover
+ * @return string removida da pilha
+*/
+char* pop(Pilha* pilha)
+{
+    if (pilhaVazia(pilha))
+    {
+        return NULL;
+    }
+    else
+    {
+        Celula* temp = pilha->topo;
+        char* str = temp->string;
+        pilha->topo = temp->proximo;
+        free(temp);
+        
+        return str;
+    }
+}
+
+/**
+ * @author Gabriel Nogueira
+ * @reason Verificar se a pilha está vazia
+ * @param pilha pilha a verificar
+ * @return true se vazia, false caso contrário
+*/
+bool pilhaVazia(Pilha* pilha)
+{
+    return pilha->topo == NULL;
+}

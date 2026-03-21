@@ -7,8 +7,8 @@ Funções:
 Função          Mnemonico    Código Hexa
 W=Y             CopiaB       1
 W=X             CopiaA       0
-W=X⊕Y           AxB         2
-W=X'⊕B'         nAxnB       3
+W=X⊕Y          AxB          2
+W=X'⊕B'        nAxnB        3
 W=(X.Y)'        AeBn         4
 W=Y'            nB           5
 W=X'+Y'         naonB        6
