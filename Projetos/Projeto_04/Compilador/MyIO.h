@@ -85,18 +85,18 @@ char trocarMne ( char palavra[] )
     {
         /* 1 */
         if ( palavra[2] == 'C' && palavra[7] == 'B' ) // CopiaB
-            x = '0';
+            x = '1';
  
         /* 2 */
         if ( palavra[2] == 'C' && palavra[7] == 'A' ) // CopiaA
-            x = '1';
+            x = '0';
  
         /* 4 */
         if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'x' && palavra[5] == 'n' && palavra[6] == 'B' ) // nAxnB
             x = '3';
  
         /* 7 */
-        if ( palavra[2] == 'n' && palavra[3] == 'a' && palavra[4] == 'o' && palavra[5] == 'n' && palavra[6] == 'B' ) // naonB
+        if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'o' && palavra[5] == 'n' && palavra[6] == 'B' ) // nAonB
             x = '6';
  
         /* 11 */
@@ -104,7 +104,7 @@ char trocarMne ( char palavra[] )
             x = 'A';
  
         /* 16 */
-        if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'e' && palavra[5] == 'n' && palavra[6] == 'B' ) // nAeBn
+        if ( palavra[2] == 'n' && palavra[3] == 'A' && palavra[4] == 'e' && palavra[5] == 'n' && palavra[6] == 'B' ) // nAenB
             x = 'F';
  
         /* 14 */
@@ -140,7 +140,7 @@ char trocarMne ( char palavra[] )
             x = '9';
  
         /* 12 */
-        if ( palavra[2] == 'A' && palavra[3] == 'B' ) // AB
+        if ( palavra[2] == 'A' && palavra[3] == 'e' && palavra[4] == 'B' ) // AeB
             x = 'B';
  
         /* 12 */
