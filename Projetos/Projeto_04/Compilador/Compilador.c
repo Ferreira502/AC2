@@ -81,6 +81,7 @@ void gerarArquivoHex( Pilha* pilhaResultado, FILE* arquivoHex )
     // Registradores X e Y
     char X = ' ';
     char Y = ' ';
+    char W = ' ';
  
     // pilhaB.topo
     while ( !pilhaVazia(pilhaResultado) )
@@ -96,6 +97,7 @@ void gerarArquivoHex( Pilha* pilhaResultado, FILE* arquivoHex )
                 Y = trocarMne(elemento);
                 break;
             case 'W':
+                W = trocarMne(elemento);
                 // Converte W e escreve XYW no arquivo hex
                 fprintf( arquivoHex, "%c%c%c\n", X, Y, trocarMne(elemento) );
                 break;
