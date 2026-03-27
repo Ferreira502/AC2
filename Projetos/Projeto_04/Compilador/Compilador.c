@@ -56,7 +56,7 @@ Pilha* lerLinhas(FILE* arquivo_fp)
     }
  
     // Transfere as linhas da pilha A para pilha B, armazenando na ordem correta
-    while (!pilhaVazia(pilhaA))
+    while (!pilhaVazia(pilhaA) && !linhaValida(linha)) // ele vai transferindo enquanto a linha for valida e a pilha A nao estiver vazia
     {
         char* elemento = pop(pilhaA);
         push(pilhaB, elemento);

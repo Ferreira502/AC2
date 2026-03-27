@@ -202,14 +202,21 @@ bool linhaValida(const char* linha)
     {
         if(linha[length - 1] != ';')
         {
-            valido = 0;
+            valido = 0; // se aparecer linha como x=2 sem ; vai aparecer erro
+        }
+        else
+        {
+            valido = 1;
+        }
+
+        for (int i = 0; i < length - 1 ; i++)
+        {
+            if (linha[i] == '=' && linha[i + 1] == ';') // se aparecer x=; ele mostra erro
+            {
+                valido = 0;
+            }
         }
     }
-    else
-    {
-        valido = 0;
-    }
-
     return valido;
 }
 
