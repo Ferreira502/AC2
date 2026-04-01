@@ -46,6 +46,7 @@ int vai1;
 // Variaveis Globais
 String memoria[MAX_IO];
 int n;
+int programaRodando = 1;
 int registrador[MAX_REG];
 int saida;
 int vai1;
@@ -54,29 +55,41 @@ int ledAmarelo = 12;
 int ledVerde = 11;
 int ledAzul = 10;
 
-// Converte char hexadecimal para inteiro
-
+/**
+ * @author Gabriel Ferreira
+ *
+ * @param char c caractere hexadecimal
+ *
+ * @reason  A instrucao chega como texto e precisamos
+ *          de numeros para fazer os calculos da ULA
+ */
 int hexParaInt(char c) {
-  if (c == '0') return 0;
-  if (c == '1') return 1;
-  if (c == '2') return 2;
-  if (c == '3') return 3;
-  if (c == '4') return 4;
-  if (c == '5') return 5;
-  if (c == '6') return 6;
-  if (c == '7') return 7;
-  if (c == '8') return 8;
-  if (c == '9') return 9;
-  if (c == 'A') return 10;
-  if (c == 'B') return 11;
-  if (c == 'C') return 12;
-  if (c == 'D') return 13;
-  if (c == 'E') return 14;
-  if (c == 'F') return 15;
+  if (c == '0') { return 0; }
+  if (c == '1') { return 1; }
+  if (c == '2') { return 2; }
+  if (c == '3') { return 3; }
+  if (c == '4') { return 4; }
+  if (c == '5') { return 5; }
+  if (c == '6') { return 6; }
+  if (c == '7') { return 7; }
+  if (c == '8') { return 8; }
+  if (c == '9') { return 9; }
+  if (c == 'A') { return 10; }
+  if (c == 'B') { return 11; }
+  if (c == 'C') { return 12; }
+  if (c == 'D') { return 13; }
+  if (c == 'E') { return 14; }
+  if (c == 'F') { return 15; }
   return 0;
 }
 
-// Converte inteiro para char hexadecimal
+/**
+ * @author Gabriel Ferreira
+ *
+ * @param int c numero inteiro
+ *
+ * @reason  converte inteiro para caractere hexadecimal       
+ */
 
 char intParaHex(int v) 
 {
@@ -99,82 +112,133 @@ char intParaHex(int v)
   return '0';
 }
 
-void acenderLeds( int valor ) 
+/**
+ * @author Gabriel Ferreira
+ *
+ * @param int valor numero inteiro
+ *
+ * @reason Recebe o resultado da ULA e acende os 4 LEDs
+ *         representando o numero em binario de 4 bits
+ * 		   LED vermelho = bit 3 | LED amarelo = bit 2
+ * 		   LED verde    = bit 1 | LED azul    = bit 0
+ * 		   Exemplo: valor 6 = binario 0110
+ *  	   vermelho=LOW amarelo=HIGH verde=HIGH azul=LOW   
+ */
+
+void acenderLeds(int valor)
 {
-  if (valor == 0) { digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, LOW);
-  } else if (valor == 1) {
-    digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, HIGH);
-  } else if (valor == 2) {
-    digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, LOW);
-  } else if (valor == 3) {
-    digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, HIGH);
-  } else if (valor == 4) {
-    digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, LOW);
-  } else if (valor == 5) {
-    digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, HIGH);
-  } else if (valor == 6) {
-    digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, LOW);
-  } else if (valor == 7) {
-    digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, HIGH);
-  } else if (valor == 8) {
-    digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, LOW);
-  } else if (valor == 9) {
-    digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, HIGH);
-  } else if (valor == 10) {
-    digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, LOW);
-  } else if (valor == 11) {
-    digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, HIGH);
-  } else if (valor == 12) {
-    digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, LOW);
-  } else if (valor == 13) {
-    digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, HIGH);
-  } else if (valor == 14) {
-    digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, LOW);
-  } else if (valor == 15) {
-    digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, HIGH);
-  }
+  // 0 = 0000: todos apagados
+  if (valor == 0)  { digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, LOW);  }
+  // 1 = 0001: so azul aceso
+  else if (valor == 1)  { digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, HIGH); }
+  // 2 = 0010: so verde aceso
+  else if (valor == 2)  { digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, LOW);  }
+  // 3 = 0011: verde e azul acesos
+  else if (valor == 3)  { digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, HIGH); }
+  // 4 = 0100: so amarelo aceso
+  else if (valor == 4)  { digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, LOW);  }
+  // 5 = 0101: amarelo e azul acesos
+  else if (valor == 5)  { digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, HIGH); }
+  // 6 = 0110: amarelo e verde acesos
+  else if (valor == 6)  { digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, LOW);  }
+  // 7 = 0111: amarelo, verde e azul acesos
+  else if (valor == 7)  { digitalWrite(ledVermelho, LOW);  digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, HIGH); }
+  // 8 = 1000: so vermelho aceso
+  else if (valor == 8)  { digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, LOW);  }
+  // 9 = 1001: vermelho e azul acesos
+  else if (valor == 9)  { digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, HIGH); }
+  // 10 = 1010: vermelho e verde acesos
+  else if (valor == 10) { digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, LOW);  }
+  // 11 = 1011: vermelho, verde e azul acesos
+  else if (valor == 11) { digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, LOW);  digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, HIGH); }
+  // 12 = 1100: vermelho e amarelo acesos
+  else if (valor == 12) { digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, LOW);  }
+  // 13 = 1101: vermelho, amarelo e azul acesos
+  else if (valor == 13) { digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, LOW);  digitalWrite(ledAzul, HIGH); }
+  // 14 = 1110: vermelho, amarelo e verde acesos
+  else if (valor == 14) { digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, LOW);  }
+  // 15 = 1111: todos acesos
+  else if (valor == 15) { digitalWrite(ledVermelho, HIGH); digitalWrite(ledAmarelo, HIGH); digitalWrite(ledVerde, HIGH); digitalWrite(ledAzul, HIGH); }
 }
 
-void dump(int proximaInstrucao) 
+/**
+ * @author Gabriel Ferreira
+ *
+ * @param int proximaInstrucao numero inteiro
+ *
+ * @reason Mostra no monitor serial o estado atual da memoria e
+ *         dos registradores apos cada execucao de instrucao
+ * 		     Recebe o indice da instrucao que acabou de ser executada
+ * 		     para marcar com ">" no display da memoria
+ */
+void dump(int instrucaoAtual)
 {
+  // Imprime separador visual entre cada execucao
   Serial.println("--");
+
+  // Inicia a linha da memoria
   Serial.print("Memoria:       |");
-  
-  for (int i = 0; i < n; i++) 
+
+  // Percorre todas as posicoes da memoria que tem instrucao
+  for (int i = 0; i < n; i++)
   {
-    if (i == proximaInstrucao)
+    // Se esta posicao foi a instrucao executada, marca com ">"
+    if (i == instrucaoAtual)
     {
       Serial.print(">");
     }
-
-    else                       
+    else
+    // Caso contrario, coloca espaco
     {
       Serial.print(" ");
     }
 
+    // Imprime o conteudo da posicao da memoria
     Serial.print(memoria[i]);
+
+    // Fecha o campo desta posicao com " |"
     Serial.print(" |");
   }
 
+  // Pula linha apos mostrar toda a memoria
   Serial.println();
+
+  // Inicia a linha dos registradores
   Serial.print("Registradores: |");
-  Serial.print(" "); 
-  Serial.print(registrador[0]);            
+
+  // Mostra PC (registrador[0]) em decimal — indica qual instrucao foi a ultima
+  Serial.print(" ");
+  Serial.print(registrador[0]);
   Serial.print(" |");
-  Serial.print(" "); 
-  Serial.print(intParaHex(registrador[1])); 
+
+  // Mostra W (registrador[1]) em hexadecimal — resultado da operacao
+  Serial.print(" ");
+  Serial.print(intParaHex(registrador[1]));
   Serial.print(" |");
-  Serial.print(" "); 
-  Serial.print(intParaHex(registrador[2])); 
+
+  // Mostra X (registrador[2]) em hexadecimal — primeiro operando
+  Serial.print(" ");
+  Serial.print(intParaHex(registrador[2]));
   Serial.print(" |");
-  Serial.print(" "); 
-  Serial.print(intParaHex(registrador[3])); 
+
+  // Mostra Y (registrador[3]) em hexadecimal — segundo operando
+  Serial.print(" ");
+  Serial.print(intParaHex(registrador[3]));
   Serial.print(" |");
+
+  // Pula linha apos os registradores
   Serial.println();
+
+  // Linha em branco para separar do proximo dump
   Serial.println();
 }
 
-
+/**
+ * @author Gabriel Ferreira
+ * @reason Executada UMA UNICA VEZ quando o Arduino liga
+ *         Inicializa a comunicacao serial, os pinos dos LEDs,
+ * 		   a memoria e o banco de registradores
+ */
 void setup()
 {
   Serial.begin(9600);
@@ -183,115 +247,204 @@ void setup()
   pinMode(ledVerde, OUTPUT);
   pinMode(ledAzul, OUTPUT);
 
-  for ( int i = 0; i < MAX_IO; i++ )
+  // Preenche todas as 100 posicoes da memoria com "000"
+  for (int i = 0; i < MAX_IO; i++)
   {
-      memoria[i] = "000";
+    memoria[i] = "000";
   }
 
-  for ( int i = 0; i < MAX_REG; i++ )
+  // Zera todos os 4 registradores (PC=0, W=0, X=0, Y=0)
+  for (int i = 0; i < MAX_REG; i++)
   {
-      registrador[i] = 0;
+    registrador[i] = 0;
   }
 }
+
+/**
+ * @author Gabriel Ferreira
+ * @reason Executada enquanto o Arduino estiver ligado
+ * 	  	   Contem toda a logica de carga e execucao do programa
+ */
 void loop()
 {
-  if (Serial.available() >= 3)
+  // So executa se o programa ainda nao terminou
+  if (programaRodando == 1)
   {
-    // Fazer vericacao de c1,c2,c3 se ele e maior que A e menor que Z
+    // Verifica se chegaram pelo menos 3 bytes na serial
+    if (Serial.available() >= 3)
+    {
+      // Le os 3 caracteres da instrucao
+      char c1 = Serial.read(); // X
+      char c2 = Serial.read(); // Y
+      char c3 = Serial.read(); // Operacao
 
-    char c1 = Serial.read(); // C
-    char c2 = Serial.read(); // 6
-    char c3 = Serial.read(); // B
+      // Monta a instrucao juntando os 3 caracteres em uma String
+      String instrucao = "";
+      instrucao += c1;
+      instrucao += c2;
+      instrucao += c3;
 
-    String instrucao = "";
-    instrucao += c1;
-    instrucao += c2;
-    instrucao += c3;
-
-   if (instrucao == "000")  
-   {
-      Serial.println("Programa carregado na memoria");
-      dump(0);
-
-      Serial.println("Deseja executar o programa (S/N)?");
-
-      while (Serial.available() == 0);
+      // Verifica se e o codigo de fim de carga
+      // "000" significa que o usuario terminou de digitar instrucoes
+      if (instrucao == "000")
       {
-        char resposta = Serial.read();
-      }
+        Serial.println("Programa carregado na memoria");
+        // Mostra estado inicial da memoria e registradores
+        dump(0);
 
-      if (resposta != 'S' && resposta != 's') 
+        // Pergunta se deseja executar
+        Serial.println("Deseja executar o programa (S/N)?");
+
+        // Inicializa resposta para entrar no while
+        char resposta = ' ';
+
+        // Aguarda o usuario digitar S, s, N ou n
+        while (resposta != 'S' && resposta != 's' && resposta != 'N' && resposta != 'n')
+        {
+          if (Serial.available() > 0)
+          {
+            resposta = Serial.read();
+          }
+        }
+
+        // Se digitou N ou n, cancela a execucao
+        if (resposta != 'S' && resposta != 's')
+        {
+          Serial.println("Execucao cancelada.");
+          return;
+        }
+
+        // Inicia execucao
+        Serial.println("Executando...");
+
+        // Repete enquanto o PC for menor que n (numero de instrucoes)
+        while (registrador[0] < n)
+        {
+          // Salva o PC atual para usar como indice
+          int pc = registrador[0];
+
+          // Le os 3 caracteres da instrucao na posicao pc da memoria
+          char cx = memoria[pc][0]; // X
+          char cy = memoria[pc][1]; // Y
+          char op = memoria[pc][2]; // Operacao
+
+          // Converte X e Y de hexadecimal para inteiro
+          int vx = hexParaInt(cx);
+          int vy = hexParaInt(cy);
+
+          // Atualiza os registradores X e Y
+          registrador[2] = vx;
+          registrador[3] = vy;
+
+          // OPERACOES DA ULA
+
+          // op '0' — CopiaA: W = X
+          if (op == '0') saida = vx;
+
+          // op '1' — CopiaB: W = Y
+          if (op == '1') saida = vy;
+
+          // op '2' — AxB: W = X XOR Y
+          if (op == '2') saida = vx ^ vy;
+
+          // op '3' — nAxnB: W = NOT(X) XOR NOT(Y)
+          if (op == '3') saida = (~vx) ^ (~vy);
+
+          // op '4' — AeBn: W = NOT(X AND Y)
+          if (op == '4') saida = ~(vx & vy);
+
+          // op '5' — nB: W = NOT(Y)
+          if (op == '5') saida = ~vy;
+
+          // op '6' — nAonB: W = NOT(X) OR NOT(Y)
+          if (op == '6') saida = (~vx) | (~vy);
+
+          // op '7' — nA: W = NOT(X)
+          if (op == '7') saida = ~vx;
+
+          // op '8' — AonB: W = X OR NOT(Y)
+          if (op == '8') saida = vx | (~vy);
+
+          // op '9' — UmL: W = 15 
+          if (op == '9') saida = 15;
+
+          // op 'A' — ZeroL: W = 0 
+          if (op == 'A') saida = 0;
+
+          // op 'B' — AeB: W = X AND Y
+          if (op == 'B') saida = vx & vy;
+
+          // op 'C' — nAeB: W = NOT(X) AND Y
+          if (op == 'C') saida = (~vx) & vy;
+
+          // op 'D' — AenB: W = X AND NOT(Y)
+          if (op == 'D') saida = vx & (~vy);
+
+          // op 'E' — AoB: W = X OR Y
+          if (op == 'E') saida = vx | vy;
+
+          // op 'F' — nAenB: W = NOT(X) AND NOT(Y)
+          if (op == 'F') saida = (~vx) & (~vy);
+
+          // Corrige resultado para ficar entre 0 e 15
+          while (saida < 0)
+          {
+            saida = saida + 16;
+          }
+
+          while (saida > 15)
+          {
+            saida = saida - 16;
+          }
+
+          // Salva o resultado no registrador W
+          registrador[1] = saida;
+
+          // Incrementa o PC para a proxima instrucao
+          registrador[0]++;
+
+          // Acende os LEDs de acordo com o resultado
+          acenderLeds(saida);
+
+          // Mostra o dump passando pc
+          dump(pc);
+
+          // Aguarda 4 segundos antes da proxima instrucao
+          delay(4000);
+        }
+
+        Serial.println("Programa concluido!");
+
+        digitalWrite(ledVermelho, LOW);
+        digitalWrite(ledAmarelo,  LOW);
+        digitalWrite(ledVerde,    LOW);
+        digitalWrite(ledAzul,     LOW);
+
+        // Encerra o programa sem travar o Arduino
+        programaRodando = 0;
+
+      }
+      else
       {
-        Serial.println("Execucao cancelada.");
-        return;
+        // CARGA
+        // Se nao e "000", armazena a instrucao na memoria
+
+        // Guarda a instrucao na posicao atual
+        memoria[n] = instrucao;
+        n++;
+
+        // Mostra a memoria atualizada
+        Serial.print("Memoria:       |");
+
+        for (int i = 0; i < n; i++)
+        {
+          Serial.print(" ");
+          Serial.print(memoria[i]);
+          Serial.print(" |");
+        }
+
+        Serial.println();
       }
-
-      Serial.println("Executando...");
-
-      // EXECUCAO
-      while (registrador[0] < n) {
-        int pc = registrador[0];
-
-        char cx = memoria[pc][0];
-        char cy = memoria[pc][1];
-        char op = memoria[pc][2];
-
-        int vx = hexParaInt(cx);
-        int vy = hexParaInt(cy);
-
-        registrador[2] = vx;
-        registrador[3] = vy;
-
-        // --- 16 OPERACOES ---
-        if (op == '0') saida = vx;
-        if (op == '1') saida = vy;
-        if (op == '2') saida = vx ^ vy;
-        if (op == '3') saida = (~vx) ^ (~vy);
-        if (op == '4') saida = ~(vx & vy);
-        if (op == '5') saida = ~vy;
-        if (op == '6') saida = (~vx) | (~vy);
-        if (op == '7') saida = ~vx;
-        if (op == '8') saida = vx | (~vy);
-        if (op == '9') saida = 15;
-        if (op == 'A') saida = 0;
-        if (op == 'B') saida = vx & vy;
-        if (op == 'C') saida = (~vx) & vy;
-        if (op == 'D') saida = vx & (~vy);
-        if (op == 'E') saida = vx | vy;
-        if (op == 'F') saida = (~vx) & (~vy);
-
-        // Limita resultado a 4 bits (0 a 15)
-        if (saida < 0)  saida = saida + 16;
-        if (saida > 15) saida = saida - 16;
-
-        registrador[1] = saida;
-        registrador[0]++;
-
-        acenderLeds(saida);
-        dump(registrador[0]);
-
-        delay(4000);
-      }
-
-      Serial.println("Programa concluido!");
-      digitalWrite(ledVermelho, LOW);
-      digitalWrite(ledAmarelo,  LOW);
-      digitalWrite(ledVerde,    LOW);
-      digitalWrite(ledAzul,     LOW);
-      while (true);
-
-    } else {
-      // --- CARGA ---
-      memoria[n] = instrucao;
-      n++;
-
-      Serial.print("Memoria:       |");
-      for (int i = 0; i < n; i++) {
-        Serial.print(" ");
-        Serial.print(memoria[i]);
-        Serial.print(" |");
-      }
-      Serial.println();
     }
   }
 }
