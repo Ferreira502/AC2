@@ -119,10 +119,10 @@ char intParaHex(int v)
  *
  * @reason Recebe o resultado da ULA e acende os 4 LEDs
  *         representando o numero em binario de 4 bits
- * 		   LED vermelho = bit 3 | LED amarelo = bit 2
- * 		   LED verde    = bit 1 | LED azul    = bit 0
- * 		   Exemplo: valor 6 = binario 0110
- *  	   vermelho=LOW amarelo=HIGH verde=HIGH azul=LOW   
+ * 		     LED vermelho = bit 3 | LED amarelo = bit 2
+ * 		     LED verde    = bit 1 | LED azul    = bit 0
+ * 		     Exemplo: valor 6 = binario 0110
+ *  	     vermelho=LOW amarelo=HIGH verde=HIGH azul=LOW   
  */
 
 void acenderLeds(int valor)
