@@ -63,7 +63,8 @@ int ledAzul = 10;
  * @reason  A instrucao chega como texto e precisamos
  *          de numeros para fazer os calculos da ULA
  */
-int hexParaInt(char c) {
+int hexParaInt(char c) 
+{
   if (c == '0') { return 0; }
   if (c == '1') { return 1; }
   if (c == '2') { return 2; }
@@ -119,10 +120,10 @@ char intParaHex(int v)
  *
  * @reason Recebe o resultado da ULA e acende os 4 LEDs
  *         representando o numero em binario de 4 bits
- * 		     LED vermelho = bit 3 | LED amarelo = bit 2
- * 		     LED verde    = bit 1 | LED azul    = bit 0
- * 		     Exemplo: valor 6 = binario 0110
- *  	     vermelho=LOW amarelo=HIGH verde=HIGH azul=LOW   
+ * 		   LED vermelho = bit 3 | LED amarelo = bit 2
+ * 		   LED verde    = bit 1 | LED azul    = bit 0
+ * 		   Exemplo: valor 6 = binario 0110
+ *  	   vermelho=LOW amarelo=HIGH verde=HIGH azul=LOW   
  */
 
 void acenderLeds(int valor)
@@ -168,68 +169,51 @@ void acenderLeds(int valor)
  *
  * @reason Mostra no monitor serial o estado atual da memoria e
  *         dos registradores apos cada execucao de instrucao
- * 		     Recebe o indice da instrucao que acabou de ser executada
- * 		     para marcar com ">" no display da memoria
+ * 		   Recebe o indice da instrucao que acabou de ser executada
+ * 		   para marcar com ">" no display da memoria
  */
 void dump(int instrucaoAtual)
 {
-  // Imprime separador visual entre cada execucao
   Serial.println("--");
-
-  // Inicia a linha da memoria
   Serial.print("Memoria:       |");
 
-  // Percorre todas as posicoes da memoria que tem instrucao
   for (int i = 0; i < n; i++)
   {
-    // Se esta posicao foi a instrucao executada, marca com ">"
     if (i == instrucaoAtual)
     {
       Serial.print(">");
     }
     else
-    // Caso contrario, coloca espaco
     {
       Serial.print(" ");
     }
 
-    // Imprime o conteudo da posicao da memoria
     Serial.print(memoria[i]);
-
-    // Fecha o campo desta posicao com " |"
     Serial.print(" |");
   }
 
-  // Pula linha apos mostrar toda a memoria
   Serial.println();
 
-  // Inicia a linha dos registradores
   Serial.print("Registradores: |");
 
-  // Mostra PC (registrador[0]) em decimal — indica qual instrucao foi a ultima
   Serial.print(" ");
   Serial.print(registrador[0]);
   Serial.print(" |");
 
-  // Mostra W (registrador[1]) em hexadecimal — resultado da operacao
   Serial.print(" ");
   Serial.print(intParaHex(registrador[1]));
   Serial.print(" |");
 
-  // Mostra X (registrador[2]) em hexadecimal — primeiro operando
   Serial.print(" ");
   Serial.print(intParaHex(registrador[2]));
   Serial.print(" |");
 
-  // Mostra Y (registrador[3]) em hexadecimal — segundo operando
   Serial.print(" ");
   Serial.print(intParaHex(registrador[3]));
   Serial.print(" |");
 
-  // Pula linha apos os registradores
   Serial.println();
 
-  // Linha em branco para separar do proximo dump
   Serial.println();
 }
 
@@ -247,13 +231,11 @@ void setup()
   pinMode(ledVerde, OUTPUT);
   pinMode(ledAzul, OUTPUT);
 
-  // Preenche todas as 100 posicoes da memoria com "000"
   for (int i = 0; i < MAX_IO; i++)
   {
     memoria[i] = "000";
   }
 
-  // Zera todos os 4 registradores (PC=0, W=0, X=0, Y=0)
   for (int i = 0; i < MAX_REG; i++)
   {
     registrador[i] = 0;
@@ -267,38 +249,28 @@ void setup()
  */
 void loop()
 {
-  // So executa se o programa ainda nao terminou
   if (programaRodando == 1)
   {
-    // Verifica se chegaram pelo menos 3 bytes na serial
     if (Serial.available() >= 3)
     {
-      // Le os 3 caracteres da instrucao
       char c1 = Serial.read(); // X
       char c2 = Serial.read(); // Y
       char c3 = Serial.read(); // Operacao
 
-      // Monta a instrucao juntando os 3 caracteres em uma String
       String instrucao = "";
       instrucao += c1;
       instrucao += c2;
       instrucao += c3;
 
-      // Verifica se e o codigo de fim de carga
-      // "000" significa que o usuario terminou de digitar instrucoes
       if (instrucao == "000")
       {
         Serial.println("Programa carregado na memoria");
-        // Mostra estado inicial da memoria e registradores
         dump(0);
 
-        // Pergunta se deseja executar
         Serial.println("Deseja executar o programa (S/N)?");
 
-        // Inicializa resposta para entrar no while
         char resposta = ' ';
 
-        // Aguarda o usuario digitar S, s, N ou n
         while (resposta != 'S' && resposta != 's' && resposta != 'N' && resposta != 'n')
         {
           if (Serial.available() > 0)
@@ -307,36 +279,29 @@ void loop()
           }
         }
 
-        // Se digitou N ou n, cancela a execucao
         if (resposta != 'S' && resposta != 's')
         {
           Serial.println("Execucao cancelada.");
           return;
         }
 
-        // Inicia execucao
         Serial.println("Executando...");
 
-        // Repete enquanto o PC for menor que n (numero de instrucoes)
         while (registrador[0] < n)
         {
-          // Salva o PC atual para usar como indice
           int pc = registrador[0];
 
-          // Le os 3 caracteres da instrucao na posicao pc da memoria
           char cx = memoria[pc][0]; // X
           char cy = memoria[pc][1]; // Y
           char op = memoria[pc][2]; // Operacao
 
-          // Converte X e Y de hexadecimal para inteiro
           int vx = hexParaInt(cx);
           int vy = hexParaInt(cy);
 
-          // Atualiza os registradores X e Y
           registrador[2] = vx;
           registrador[3] = vy;
 
-          // OPERACOES DA ULA
+          // 16 OPERACOES DA ULA
 
           // op '0' — CopiaA: W = X
           if (op == '0') saida = vx;
@@ -365,10 +330,10 @@ void loop()
           // op '8' — AonB: W = X OR NOT(Y)
           if (op == '8') saida = vx | (~vy);
 
-          // op '9' — UmL: W = 15 
+          // op '9' — UmL: W = 15 (todos os bits em 1)
           if (op == '9') saida = 15;
 
-          // op 'A' — ZeroL: W = 0 
+          // op 'A' — ZeroL: W = 0 (todos os bits em 0)
           if (op == 'A') saida = 0;
 
           // op 'B' — AeB: W = X AND Y
@@ -387,6 +352,7 @@ void loop()
           if (op == 'F') saida = (~vx) & (~vy);
 
           // Corrige resultado para ficar entre 0 e 15
+          // O NOT em inteiros de 32 bits pode gerar valores negativos
           while (saida < 0)
           {
             saida = saida + 16;
@@ -397,19 +363,13 @@ void loop()
             saida = saida - 16;
           }
 
-          // Salva o resultado no registrador W
           registrador[1] = saida;
-
-          // Incrementa o PC para a proxima instrucao
           registrador[0]++;
 
-          // Acende os LEDs de acordo com o resultado
           acenderLeds(saida);
 
-          // Mostra o dump passando pc
           dump(pc);
 
-          // Aguarda 4 segundos antes da proxima instrucao
           delay(4000);
         }
 
@@ -420,20 +380,17 @@ void loop()
         digitalWrite(ledVerde,    LOW);
         digitalWrite(ledAzul,     LOW);
 
-        // Encerra o programa sem travar o Arduino
         programaRodando = 0;
 
       }
       else
       {
-        // CARGA
         // Se nao e "000", armazena a instrucao na memoria
 
         // Guarda a instrucao na posicao atual
         memoria[n] = instrucao;
         n++;
 
-        // Mostra a memoria atualizada
         Serial.print("Memoria:       |");
 
         for (int i = 0; i < n; i++)

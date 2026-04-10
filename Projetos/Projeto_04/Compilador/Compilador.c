@@ -99,7 +99,7 @@ void gerarArquivoHex( Pilha* pilhaResultado, FILE* arquivoHex )
             case 'W':
                 W = trocarMne(elemento);
                 // Converte W e escreve XYW no arquivo hex
-                fprintf( arquivoHex, "%c%c%c\n", X, Y, trocarMne(elemento) );
+                fprintf( arquivoHex, "%c%c%c", X, Y, trocarMne(elemento) );
                 break;
         }
  
@@ -124,6 +124,7 @@ int main(void)
         fclose(arquivo_fp);
  
         gerarArquivoHex(pilhaResultado, arquivoHex);
+
  
         fclose(arquivoHex);
         free(pilhaResultado);
