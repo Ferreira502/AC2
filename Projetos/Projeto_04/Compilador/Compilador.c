@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include "MyIO.h"
 
-#define ARQUIVO_NOME "test.ula"
+#define ARQUIVO_NOME "TESTEULA.ula"
 #define ARQUIVO_HEX  "test.hex"
 
 /**
@@ -99,7 +99,7 @@ void gerarArquivoHex( Pilha* pilhaResultado, FILE* arquivoHex )
             case 'W':
                 W = trocarMne(elemento);
                 // Converte W e escreve XYW no arquivo hex
-                fprintf( arquivoHex, "%c%c%c", X, Y, trocarMne(elemento) );
+                fprintf( arquivoHex, "%c%c%c\n", X, Y, trocarMne(elemento) );
                 break;
         }
  

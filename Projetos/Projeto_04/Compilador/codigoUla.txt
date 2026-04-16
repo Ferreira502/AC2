@@ -118,6 +118,24 @@ char intParaHex(int v)
  *
  * @param int valor numero inteiro
  *
+ * @reason Funcao auxiliar para ler proximo char valido (ignora espacos)   
+ */
+char lerCharValido() {
+  char c = ' ';
+  
+  while (c == ' ' || c == '\n') 
+  {
+    while (Serial.available() == 0); // espera chegar algo
+    c = Serial.read();
+  }
+  return c;
+}
+
+/**
+ * @author Gabriel Ferreira
+ *
+ * @param int valor numero inteiro
+ *
  * @reason Recebe o resultado da ULA e acende os 4 LEDs
  *         representando o numero em binario de 4 bits
  * 		   LED vermelho = bit 3 | LED amarelo = bit 2
@@ -172,7 +190,7 @@ void acenderLeds(int valor)
  * 		   Recebe o indice da instrucao que acabou de ser executada
  * 		   para marcar com ">" no display da memoria
  */
-void dump(int instrucaoAtual)
+void dump(int instrucaoAtual) // instrucaoAtual recebe pc
 {
   Serial.println("--");
   Serial.print("Memoria:       |");
@@ -253,9 +271,9 @@ void loop()
   {
     if (Serial.available() >= 3)
     {
-      char c1 = Serial.read(); // X
-      char c2 = Serial.read(); // Y
-      char c3 = Serial.read(); // Operacao
+      char c1 = lerCharValido(); // X
+	  char c2 = lerCharValido(); // Y
+	  char c3 = lerCharValido(); // Operacao
 
       String instrucao = "";
       instrucao += c1;
