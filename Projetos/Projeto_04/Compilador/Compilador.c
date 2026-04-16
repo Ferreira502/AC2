@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include "MyIO.h"
 
-#define ARQUIVO_NOME "test.ula"
+#define ARQUIVO_NOME "TESTEULA.ula"
 #define ARQUIVO_HEX  "test.hex"
 
 /**
