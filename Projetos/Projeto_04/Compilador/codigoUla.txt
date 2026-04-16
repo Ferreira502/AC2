@@ -50,10 +50,10 @@ int programaRodando = 1;
 int registrador[MAX_REG];
 int saida;
 int vai1;
-int ledVermelho = 13;
+int ledVermelho = 13; //bit mais significativo
 int ledAmarelo = 12;
 int ledVerde = 11;
-int ledAzul = 10;
+int ledAzul = 10; //bit menos significativo
 
 /**
  * @author Gabriel Ferreira
@@ -116,8 +116,6 @@ char intParaHex(int v)
 /**
  * @author Gabriel Ferreira
  *
- * @param int valor numero inteiro
- *
  * @reason Funcao auxiliar para ler proximo char valido (ignora espacos)   
  */
 char lerCharValido() {
@@ -129,6 +127,22 @@ char lerCharValido() {
     c = Serial.read();
   }
   return c;
+}
+
+
+/**
+ * @author Gabriel Ferreira
+ *
+ * @param int v
+ *
+ * @reason Funcao auxiliar para trocar os bits do numero 
+ *    	   que vai ser lido, exemplo: 10 -> 1010
+ *		 	o 10 quando chamar essa funao vira: 0101 -> 5
+ * 			UTILIZADA APENAS QUANDO A OPERACAO FOR NOT
+ */
+int notBits(int v) 
+{
+    return 15 - v;   // 15 -> 1111
 }
 
 /**
@@ -190,7 +204,7 @@ void acenderLeds(int valor)
  * 		   Recebe o indice da instrucao que acabou de ser executada
  * 		   para marcar com ">" no display da memoria
  */
-void dump(int instrucaoAtual) // instrucaoAtual recebe pc
+void dump(int instrucaoAtual) // instrucaoAtual recebe posicao
 {
   Serial.println("--");
   Serial.print("Memoria:       |");
@@ -208,7 +222,7 @@ void dump(int instrucaoAtual) // instrucaoAtual recebe pc
 
     Serial.print(memoria[i]);
     Serial.print(" |");
-  }
+  } 
 
   Serial.println();
 
@@ -282,12 +296,13 @@ void loop()
 
       if (instrucao == "000")
       {
+        char resposta = ' ';
+        
         Serial.println("Programa carregado na memoria");
         dump(0);
 
         Serial.println("Deseja executar o programa (S/N)?");
-
-        char resposta = ' ';
+        
 
         while (resposta != 'S' && resposta != 's' && resposta != 'N' && resposta != 'n')
         {
@@ -331,55 +346,43 @@ void loop()
           if (op == '2') saida = vx ^ vy;
 
           // op '3' — nAxnB: W = NOT(X) XOR NOT(Y)
-          if (op == '3') saida = (~vx) ^ (~vy);
+          if (op == '3') saida = notBits(vx) ^ notBits(vy);
 
           // op '4' — AeBn: W = NOT(X AND Y)
-          if (op == '4') saida = ~(vx & vy);
+          if (op == '4') saida = notBits(vx & vy);
 
           // op '5' — nB: W = NOT(Y)
-          if (op == '5') saida = ~vy;
+          if (op == '5') saida = notBits(vy);
 
           // op '6' — nAonB: W = NOT(X) OR NOT(Y)
-          if (op == '6') saida = (~vx) | (~vy);
+          if (op == '6') saida = notBits(vx) | notBits(vy);
 
           // op '7' — nA: W = NOT(X)
-          if (op == '7') saida = ~vx;
+          if (op == '7') saida = notBits(vx);
 
           // op '8' — AonB: W = X OR NOT(Y)
-          if (op == '8') saida = vx | (~vy);
+          if (op == '8') saida = vx | notBits(vy);
 
-          // op '9' — UmL: W = 15 (todos os bits em 1)
+          // op '9' — UmL: W = 15
           if (op == '9') saida = 15;
 
-          // op 'A' — ZeroL: W = 0 (todos os bits em 0)
+          // op 'A' — ZeroL: W = 0
           if (op == 'A') saida = 0;
 
           // op 'B' — AeB: W = X AND Y
           if (op == 'B') saida = vx & vy;
 
           // op 'C' — nAeB: W = NOT(X) AND Y
-          if (op == 'C') saida = (~vx) & vy;
+          if (op == 'C') saida = notBits(vx) & vy;
 
           // op 'D' — AenB: W = X AND NOT(Y)
-          if (op == 'D') saida = vx & (~vy);
+          if (op == 'D') saida = vx & notBits(vy);
 
           // op 'E' — AoB: W = X OR Y
           if (op == 'E') saida = vx | vy;
 
           // op 'F' — nAenB: W = NOT(X) AND NOT(Y)
-          if (op == 'F') saida = (~vx) & (~vy);
-
-          // Corrige resultado para ficar entre 0 e 15
-          // O NOT em inteiros de 32 bits pode gerar valores negativos
-          while (saida < 0)
-          {
-            saida = saida + 16;
-          }
-
-          while (saida > 15)
-          {
-            saida = saida - 16;
-          }
+          if (op == 'F') saida = notBits(vx) & notBits(vy);
 
           registrador[1] = saida;
           registrador[0]++;

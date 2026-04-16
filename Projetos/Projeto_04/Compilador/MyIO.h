@@ -150,24 +150,34 @@ char trocarMne ( char palavra[] )
             x = 'F';
  
         /* valor direto*/
+        // Entra aqui se nenhum mnemonico foi reconhecido antes e o valor tem so 1 caractere ex: X=B; ou X=5;
         if ( x == ' ' && (palavra[3] == ';' || palavra[3] == '\0') )
         {
-            y = palavra[2];
+            y = palavra[2]; // Pega o unico digito posicao 2 da string, ex: X=B; -> y='B'
+
+            // Verifica se e um caractere hexadecimal valido: 0-9 ou A-F
             if ( (y >= '0' && y <= '9') || (y >= 'A' && y <= 'F') )
             {
-                x = y;
+                x = y; // Valor valido retorna ele direto (ex: 'B', '5', 'A')
             }
         }
         
         // valor direto hexa 2 digitos
+        // Entra aqui se nenhum mnemonico foi reconhecido E o valor tem 2 caracteres ex: X=11; ou X=15;
         if ( x == ' ' && palavra[3] != ';' && palavra[4] == ';' )
         {
-            y = palavra[2];
-            z = palavra[3];
+            y = palavra[2]; // Pega o primeiro digito ex: X=11; -> y='1'
+            z = palavra[3]; // Pega o segundo digito ex: X=11; -> z='1'
 
             if ( y >= '0' && y <= '9' && z >= '0' && z <= '9' )
             {
-                valor = ( y - '0' ) * 10 + ( z - '0' );   // Conversao de char para int '1' - '0'  =  49 - 48  =  1
+                // Converte os dois chars para inteiro
+                // Truque ASCII: '1' - '0' = 49 - 48 = 1
+                // Ex: y='1', z='1' -> valor = 1*10 + 1 = 11
+                valor = ( y - '0' ) * 10 + ( z - '0' ); 
+
+                // So converte se estiver na faixa 10-15 (equivalente hex A-F)
+                // Valores fora disso (ex: 99) sao ignorados e x continua ' '
                 if ( valor >= 10 && valor <= 15 )
                 {
                     x = 'A' + (valor - 10); // Acrescentando o valor para retornar o seu valor em Hexadecimal

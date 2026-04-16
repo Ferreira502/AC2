@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include "MyIO.h"
 
-#define ARQUIVO_NOME "TESTEULA.ula"
+#define ARQUIVO_NOME "test.ula"
 #define ARQUIVO_HEX  "test.hex"
 
 /**
@@ -110,6 +110,7 @@ void gerarArquivoHex( Pilha* pilhaResultado, FILE* arquivoHex )
 int main(void)
 {
     FILE* arquivo_fp = fopen(ARQUIVO_NOME, "r");
+
     if (arquivo_fp != NULL)
     {
         FILE* arquivoHex = fopen(ARQUIVO_HEX, "w");
@@ -129,6 +130,7 @@ int main(void)
         fclose(arquivoHex);
         free(pilhaResultado);
     }
+
     else
     {
         printf("Erro ao abrir o arquivo %s\n", ARQUIVO_NOME);
