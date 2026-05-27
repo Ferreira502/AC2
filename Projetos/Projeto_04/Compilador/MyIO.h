@@ -67,7 +67,7 @@ void println(const char* frase)
  */
 void printErroLinha(const char* frase, int indiceLinha)
 {
-    printf("Erro na leitura da linha %d\nEntrada: %s\n", indiceLinha, frase);
+    printf("Erro na leitura da linha %d\nEntrada: '%s'\n", indiceLinha, frase);
 }
 
 /**
@@ -161,9 +161,12 @@ char trocarMne ( char palavra[] )
                 x = y; // Valor valido retorna ele direto (ex: 'B', '5', 'A')
             }
         }
-        
-        // valor direto hexa 2 digitos
-        // Entra aqui se nenhum mnemonico foi reconhecido E o valor tem 2 caracteres ex: X=11; ou X=15;
+
+        /*
+            valor direto hexa 2 digitos
+            Entra aqui se nenhum mnemonico foi reconhecido E o valor tem 2 caracteres ex: X=11; ou X=15;
+        */
+
         if ( x == ' ' && palavra[3] != ';' && palavra[4] == ';' )
         {
             y = palavra[2]; // Pega o primeiro digito ex: X=11; -> y='1'
@@ -171,13 +174,17 @@ char trocarMne ( char palavra[] )
 
             if ( y >= '0' && y <= '9' && z >= '0' && z <= '9' )
             {
-                // Converte os dois chars para inteiro
-                // Truque ASCII: '1' - '0' = 49 - 48 = 1
-                // Ex: y='1', z='1' -> valor = 1*10 + 1 = 11
+                /*
+                    Converte os dois chars para inteiro
+                    Truque ASCII: '1' - '0' = 49 - 48 = 1
+                    Ex: y='1', z='1' -> valor = 1*10 + 1 = 11
+                */
                 valor = ( y - '0' ) * 10 + ( z - '0' ); 
 
-                // So converte se estiver na faixa 10-15 (equivalente hex A-F)
-                // Valores fora disso (ex: 99) sao ignorados e x continua ' '
+                /*
+                    So converte se estiver na faixa 10-15 (equivalente hex A-F)
+                    Valores fora disso (ex: 99) sao ignorados e x continua ' '
+                */
                 if ( valor >= 10 && valor <= 15 )
                 {
                     x = 'A' + (valor - 10); // Acrescentando o valor para retornar o seu valor em Hexadecimal
