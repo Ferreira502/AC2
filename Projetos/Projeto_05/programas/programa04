@@ -3,7 +3,7 @@ addi $s1, $zero, 4       # y = 4
 
 # 15 * x
 sll  $t0, $s0, 4         # t0 = x * 16 = 48
-sub  $t0, $t0, $s0       # t0 = x * 15 = 45
+sub  $t0, $t0, $s0       # t0 = x * 15 = 45, diminui 3 vindo do $s1
 
 # 67 * y
 sll  $t1, $s1, 6         # t1 = y * 64 = 256
