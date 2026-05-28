@@ -75,44 +75,104 @@ SUB — Subtração entre registradores
 3. INSTRUÇÕES DE DESLOCAMENTO DE BITS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Deslocamento é mover os bits de um número para a esquerda ou direita.
-O parâmetro "shamt" (shift amount) indica quantas posições deslocar.
+O que é deslocamento?
+  Imagine os 32 bits do registrador como uma fila. Deslocar significa
+  empurrar todos os bits para um lado, preenchendo os espaços que sobram
+  com zeros (ou com o bit de sinal, no caso do sra).
+
+  O parâmetro "shamt" (shift amount) indica quantas posições deslocar.
+  Cada posição para a esquerda multiplica por 2; cada posição para a
+  direita divide por 2.
+
+  Resumo visual:
+    sll → bits vão para ← esquerda  | zeros entram pela direita
+    srl → bits vão para → direita   | zeros entram pela esquerda
+    sra → bits vão para → direita   | bit de sinal entra pela esquerda
+
 
 SLL — Shift Left Logical (deslocamento à esquerda)
   Move todos os bits para a esquerda, preenchendo os espaços da direita com
   zeros. Cada posição deslocada equivale a multiplicar por 2. Deslocar 3
-  posições equivale a multiplicar por 8 (2³).
+  posições equivale a multiplicar por 8 (2³). Nunca altera o comportamento
+  por causa do sinal — funciona igual para positivos e negativos.
 
   Sintaxe : sll $rd, $rt, shamt
   Operação: $rd = $rt << shamt
 
-  Exemplo:
-    sll $t1, $t0, 2   # $t1 = $t0 * 4  (desloca 2 bits à esquerda)
+  Exemplo visual (sll 3 posições, valor = 1):
+    Antes : 0000 0000 0000 0000 0000 0000 0000 0001  (= 1)
+    Depois: 0000 0000 0000 0000 0000 0000 0000 1000  (= 8)
+                                             ↑
+                                    bit se moveu 3 casas, zeros entraram
+
+  Exemplo em código:
+    addi $t0, $zero, 8
+    sll  $t1, $t0, 2    # $t1 = 8 * 4 = 32  (desloca 2 → multiplica por 4)
+    sll  $t1, $t0, 3    # $t1 = 8 * 8 = 64  (desloca 3 → multiplica por 8)
+
+  Truque: sll n posições = multiplicar por 2ⁿ
+    sll 1 = x2  |  sll 2 = x4  |  sll 3 = x8  |  sll 4 = x16
 
 
 SRL — Shift Right Logical (deslocamento à direita lógico)
   Move todos os bits para a direita, preenchendo os espaços da esquerda com
-  zeros. Ignora o sinal do número. Usado para números sem sinal (unsigned).
-  Cada posição deslocada equivale a dividir por 2.
+  zeros. IGNORA o sinal do número — se o número era negativo (bit 31 = 1),
+  após o srl o bit 31 vira 0, tornando o resultado positivo. Use APENAS
+  para números sem sinal (unsigned).
 
   Sintaxe : srl $rd, $rt, shamt
   Operação: $rd = $rt >> shamt  (sem sinal)
 
-  Exemplo:
-    srl $t1, $t0, 1   # $t1 = $t0 / 2  (divide por 2)
+  Exemplo visual (srl 1 posição, número negativo):
+    Antes : 1000 0000 0000 0000 0000 0000 0000 1000  (negativo)
+    Depois: 0100 0000 0000 0000 0000 0000 0000 0100  (virou positivo!)
+            ↑
+          zero entrou aqui — sinal perdido!
+
+  Exemplo em código:
+    addi $t0, $zero, 32
+    srl  $t1, $t0, 1    # $t1 = 32 / 2  = 16
+    srl  $t1, $t0, 2    # $t1 = 32 / 4  = 8
+    srl  $t1, $t0, 3    # $t1 = 32 / 8  = 4
 
 
 SRA — Shift Right Arithmetic (deslocamento à direita aritmético)
-  Igual ao srl, mas preserva o bit de sinal (bit mais à esquerda). Se o
-  número for negativo, os bits inseridos à esquerda serão 1 ao invés de 0,
-  mantendo o resultado negativo. Use sempre que trabalhar com números
-  negativos.
+  Igual ao srl, mas em vez de inserir zeros à esquerda, COPIA o bit de
+  sinal (bit 31). Se o número era negativo (bit 31 = 1), os bits que
+  entram pela esquerda também são 1, mantendo o resultado negativo.
+  Use sempre que trabalhar com números com sinal (signed).
 
   Sintaxe : sra $rd, $rt, shamt
   Operação: $rd = $rt >>> shamt  (com sinal)
 
-  Exemplo:
-    sra $t1, $t0, 1   # $t1 = $t0 / 2  (preserva sinal negativo)
+  Exemplo visual (sra 1 posição, número negativo):
+    Antes : 1000 0000 0000 0000 0000 0000 0000 1000  (negativo)
+    Depois: 1100 0000 0000 0000 0000 0000 0000 0100  (continua negativo)
+            ↑
+          1 entrou aqui — sinal preservado!
+
+  Exemplo em código:
+    addi $t0, $zero, 32
+    sra  $t1, $t0, 1    # $t1 = 32 / 2 = 16  (positivo, funciona igual srl)
+
+  Caso especial — espalhar o bit de sinal:
+    # Transformar 0x00000001 em 0xFFFFFFFF usando só deslocamentos:
+    ori $8, $0, 0x01      # $8 = 0x00000001
+    sll $8, $8, 31        # $8 = 0x80000000  (bit 1 vai para posição 31)
+    sra $8, $8, 31        # $8 = 0xFFFFFFFF  (bit de sinal se espalha!)
+
+  Visualizando:
+    0000...0001  →(sll 31)→  1000...0000  →(sra 31)→  1111...1111
+
+
+Tabela comparativa dos três deslocamentos:
+  ┌───────────┬──────────┬──────────────────────┬──────────┬──────────────────┐
+  │ Instrução │ Direção  │ Preenche com         │ Sinal?   │ Uso principal    │
+  ├───────────┼──────────┼──────────────────────┼──────────┼──────────────────┤
+  │ sll       │ Esquerda │ zeros à direita      │ —        │ Multiplicar x 2ⁿ │
+  │ srl       │ Direita  │ zeros à esquerda     │  Perde   │ Dividir unsigned │
+  │ sra       │ Direita  │ copia bit de sinal   │  Guarda  │ Dividir signed   │
+  └───────────┴──────────┴──────────────────────┴──────────┴──────────────────┘
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -289,12 +349,42 @@ LUI — Load Upper Immediate
   registrador, zerando os 16 bits inferiores. Sozinho é pouco útil,
   mas combinado com ori permite carregar qualquer valor de 32 bits.
 
+  Por que precisa disso?
+    O imediato das instruções tem limite de 16 bits (máximo 32767).
+    Para valores maiores, é preciso "montar" o número em duas partes:
+    a parte alta (bits 31-16) com lui, e a parte baixa (bits 15-0) com ori.
+
   Sintaxe : lui $rt, imm
   Operação: $rt = imm << 16
 
+  Visualização do registrador após lui:
+    [ bits 31-16  ]  [ bits 15-0   ]
+    [ lui coloca  ]  [ fica zero   ]
+
   Exemplo (carregar o valor 0x12345678):
-    lui  $t0, 0x1234    # $t0 = 0x12340000
+    lui  $t0, 0x1234       # $t0 = 0x12340000
     ori  $t0, $t0, 0x5678  # $t0 = 0x12345678
+
+  Após lui:   0001 0010 0011 0100 | 0000 0000 0000 0000
+  Após ori:   0001 0010 0011 0100 | 0101 0110 0111 1000
+
+  Como converter um valor grande para lui + ori:
+    1. Escreva o valor em hexadecimal
+    2. Pegue os 4 primeiros dígitos hex → parte alta (vai no lui)
+    3. Pegue os 4 últimos dígitos hex  → parte baixa (vai no ori)
+
+  Exemplos práticos:
+    Valor 2147483647 = 0x7FFFFFFF:
+      lui $s0, 0x7FFF        # parte alta
+      ori $s0, $s0, 0xFFFF   # parte baixa → $s0 = 2147483647
+
+    Valor 300000 = 0x000493E0:
+      lui $s1, 0x0004        # parte alta
+      ori $s1, $s1, 0x93E0   # parte baixa → $s1 = 300000
+
+  Regra geral:
+    Valor até 32767    → addi $t0, $zero, valor   (direto)
+    Valor acima disso  → lui + ori                (duas instruções)
 
 
 LW — Load Word (carregar palavra da memória)
@@ -336,9 +426,10 @@ SW — Store Word (armazenar palavra na memória)
 │ int f = a * b;                  │ mult $t0, $t1  /  mflo $t5               │
 │ int g = a / b;                  │ div  $t0, $t1  /  mflo $t6               │
 │ int h = a % b;                  │ div  $t0, $t1  /  mfhi $t7               │
-│ int i = a * 4;                  │ sll  $t8, $t0, 2                         │
-│ int j = a / 2;                  │ srl  $t9, $t0, 1                         │
-│ int k = a | b;                  │ or   $s0, $t0, $t1                       │
+│ int i = a * 4;                  │ sll  $t8, $t0, 2   (2² = 4)              │
+│ int j = a / 2;                  │ srl  $t9, $t0, 1   (unsigned)            │
+│ int k = a / 2; (negativo)       │ sra  $t9, $t0, 1   (signed, preserva -) │
+│ int l = a | b;                  │ or   $s0, $t0, $t1                       │
 │ int l = a & b;                  │ and  $s1, $t0, $t1                       │
 │ int m = a ^ b;                  │ xor  $s2, $t0, $t1                       │
 │ a = 0;                          │ xor  $t0, $t0, $t0  (ou add $t0,$zero,$zero) │
@@ -457,10 +548,13 @@ Assembly:
   → "l" ou "s" + "w" = acesso à memória (lw = ler, sw = escrever)
   → $zero sempre vale 0 — use para zerar, copiar e comparar com zero
   → mult e div não têm destino direto — sempre use mflo/mfhi depois
-  → srl para divisão de números positivos; sra para negativos
+  → srl para divisão de números SEM sinal; sra para números COM sinal (negativos)
+  → sll n posições = multiplicar por 2ⁿ  (sll 2 = x4, sll 3 = x8)
   → Não existe subi — use addi com valor negativo: addi $t0, $t0, -1
   → Cada posição no array ocupa 4 bytes — multiplique o índice por 4 no offset
   → Para valores maiores que 32767, use lui + ori combinados
+  → lui coloca o valor nos 16 bits superiores; ori completa os 16 bits inferiores
+  → sra espalha o bit de sinal: sll 31 + sra 31 transforma qualquer valor em 0xFFFFFFFF
 
 ================================================================================
                               FIM DO GUIA
