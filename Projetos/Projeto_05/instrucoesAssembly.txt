@@ -410,6 +410,9 @@ SW — Store Word (armazenar palavra na memória)
   Exemplo:
     sw $t0, 0($s0)    # salva $t0 no endereço de memória $s0
 
+lw  →  carrega o VALOR que está na memória
+la  →  carrega o ENDEREÇO de onde algo está na memória
+
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 8. TABELA COMPARATIVA: ASSEMBLY MIPS vs LINGUAGEM C
