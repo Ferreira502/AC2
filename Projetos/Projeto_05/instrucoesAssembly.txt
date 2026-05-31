@@ -399,6 +399,8 @@ LW — Load Word (carregar palavra da memória)
     lw $t0, 0($s0)    # carrega o valor no endereço $s0 para $t0
     lw $t1, 4($s0)    # carrega o próximo inteiro (4 bytes depois)
 
+    posicao do vetor * 4 = para inserir na posicao correta
+
 
 SW — Store Word (armazenar palavra na memória)
   Armazena o valor de um registrador na memória RAM. Funciona de
