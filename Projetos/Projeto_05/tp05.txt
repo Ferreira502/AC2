@@ -1,5 +1,7 @@
 Questões resolvidas do Exercicio pratico 05
 
+Parte 01 
+
 01 ) A
 02 ) B
 03 ) A
@@ -20,3 +22,15 @@ Questões resolvidas do Exercicio pratico 05
 18 ) A
 
 
+Parte 02 
+
+01 ) C
+02 ) B
+03 ) A
+04 ) C
+05 ) B
+06 ) A
+07 ) D
+08 ) A
+09 ) C
+10 ) A
