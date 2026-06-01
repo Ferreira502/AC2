@@ -19,5 +19,5 @@ sll $10, $8, 8		# joga 0x34 para bits 31-24 -> $10 = 0x345678??
 srl $10, $10, 24  	# desloca 24 à direita ->      $10 = 0x00000034
 
 # $12 = 0x78
-sll  $12, $8, 24         # joga 0x78 para bits 31-24 -> $12 = 0x78??????
+sll  $12, $8, 24         # joga 0x78 para bits 31-24 -> $12 = 0x78
 srl  $12, $12, 24        # desloca 24 à direita      -> $12 = 0x00000078
